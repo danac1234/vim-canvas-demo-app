@@ -28,7 +28,7 @@ export const Footer = () => {
                     variant={"link"}
                   >
                     <img src={sdkSvg} />
-                    <span className="text-xs">SDK Documentation</span>
+                    <span className="text-xs">SDK DocumentatioDna</span>
                   </Button>
                 </a>
         </div>

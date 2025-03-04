@@ -1,5 +1,4 @@
 import encounterSvg from "@/assets/encounter.svg";
-
 import patientSvg from "@/assets/patient.svg";
 import referralSvg from "@/assets/referral.svg";
 import userSvg from "@/assets/user.svg";
@@ -31,6 +30,7 @@ import { useVimOSReferral } from "./hooks/useReferral";
 import { useVimOsContext } from "./hooks/useVimOsContext";
 
 function App() {
+  console.log('App component mounting...');
   const vimOs = useVimOsContext();
   const { patient } = useVimOSPatient();
   const { encounter } = useVimOSEncounter();
@@ -38,6 +38,11 @@ function App() {
   const { orders } = useVimOSOrders();
   const [redirectUrl, setRedirectUrl] = useState<string | undefined>(undefined);
   const [redirectModalOpen, setRedirectModal] = useState(false);
+  const [referralModalOpen, setReferralModalOpen] = useState(false);
+
+  console.log('Initial render - vimOs:', vimOs);
+  console.log('Initial render - patient:', patient);
+  console.log('Initial render - referral:', referral);
 
   useEffect(() => {
     vimOs.hub.setActivationStatus("ENABLED");
@@ -68,6 +73,11 @@ function App() {
     }
   }, [vimOs, setRedirectUrl]);
 
+  useEffect(() => {
+    if (!vimOs || !referral) return;
+    setReferralModalOpen(true);
+  }, [vimOs, referral]);
+
   const onRedirectModalChange = (open: boolean) => {
     if (!open) {
       setRedirectUrl(undefined);
@@ -77,6 +87,11 @@ function App() {
 
   return (
     <div className="w-full top-0 left-0 pb-6">
+      <header className="bg-white shadow-sm p-4">
+        <h1 className="text-xl font-semibold">
+          {patient?.demographics?.firstName} {patient?.demographics?.lastName}
+        </h1>
+      </header>
       <Navbar />
 
       <CollapsibleEntity entityTitle="User" entityIconUrl={userSvg}>
@@ -126,6 +141,28 @@ function App() {
             <a href={redirectUrl} target="_blank">
               <Button>Redirect</Button>
             </a>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={referralModalOpen} onOpenChange={setReferralModalOpen}>
+        <DialogContent className="max-w-[calc(100%-100px)] sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>You are going to die</DialogTitle>
+            <DialogDescription>
+              A new referral has been opened for {patient?.demographics?.firstName} {patient?.demographics?.lastName}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex items-center gap-1">
+            <Button
+              variant="secondary"
+              onClick={() => setReferralModalOpen(false)}
+            >
+              Close
+            </Button>
+            <Button onClick={() => setReferralModalOpen(false)}>
+              View Details
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
